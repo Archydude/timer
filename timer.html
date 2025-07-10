@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Cycle Timer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: red; /* Initial color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            transition: background-color 0.5s ease; /* Smooth color transition */
+        }
+        #timer {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            transform: rotate(-90deg); /* Start from top */
+        }
+        circle {
+            stroke: rgba(255, 255, 255, 0.8); /* Semi-transparent white for minimal look */
+            stroke-width: 8; /* Thinner stroke */
+            fill: none;
+            stroke-dasharray: 880; /* 2 * π * 140 ≈ 879.6, rounded */
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 0s linear; /* Set dynamically */
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5)); /* Subtle glow */
+        }
+        button {
+            position: fixed;
+            bottom: 20px;
+            padding: 8px 16px;
+            color: white;
+            border: none;
+            border-radius: 20px; /* Rounded for cooler look */
+            cursor: pointer;
+            z-index: 10;
+            font-size: 14px;
+            opacity: 0.7; /* Semi-transparent */
+            transition: opacity 0.3s ease;
+        }
+        button:hover {
+            opacity: 1;
+        }
+        #redBtn {
+            left: 20px;
+            background-color: rgba(139, 0, 0, 0.8); /* Dark red, semi-transparent */
+        }
+        #greenBtn {
+            right: 20px;
+            background-color: rgba(0, 100, 0, 0.8); /* Dark green, semi-transparent */
+        }
+    </style>
+</head>
+<body>
+    <svg id="timer">
+        <circle cx="150" cy="150" r="140"></circle> <!-- Adjusted for larger size -->
+    </svg>
+    <button id="redBtn">Red</button>
+    <button id="greenBtn">Green</button>
+
+    <script>
+        let phase = 'red';
+        const circumference = 880; // 2 * Math.PI * 140 ≈ 879.6, rounded
+        const circle = document.querySelector('circle');
+        let currentTimeout;
+
+        function runTimer(color, duration, nextFunc) {
+            document.body.style.backgroundColor = color;
+
+            // Reset and start animation for clockwise depletion
+            circle.style.transition = 'none';
+            circle.style.strokeDashoffset = `-${circumference}`;
+            requestAnimationFrame(() => {
+                circle.style.transition = `stroke-dashoffset ${duration}s linear`;
+                circle.style.strokeDashoffset = '0';
+            });
+
+            if (currentTimeout) clearTimeout(currentTimeout);
+            currentTimeout = setTimeout(nextFunc, duration * 1000);
+        }
+
+        function nextPhase() {
+            if (phase === 'red') {
+                phase = 'green';
+                runTimer('green', 60, nextPhase);
+            } else {
+                phase = 'red';
+                runTimer('red', 30, nextPhase);
+            }
+        }
+
+        function startForced(newPhase) {
+            phase = newPhase;
+            let dur = newPhase === 'red' ? 30 : 60;
+            runTimer(newPhase, dur, nextPhase);
+        }
+
+        // Event listeners for buttons
+        document.getElementById('redBtn').addEventListener('click', () => startForced('red'));
+        document.getElementById('greenBtn').addEventListener('click', () => startForced('green'));
+
+        // Start the cycle initially
+        runTimer('red', 30, nextPhase);
+
+        // Attempt to go fullscreen automatically (may require user interaction in some browsers)
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(() => {});
+        } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+            document.documentElement.mozRequestFullScreen().catch(() => {});
+        } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari, Opera
+            document.documentElement.webkitRequestFullscreen().catch(() => {});
+        } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+            document.documentElement.msRequestFullscreen().catch(() => {});
+        }
+    </script>
+</body>
+</html>
