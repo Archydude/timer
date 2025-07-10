@@ -1,2 +1,0 @@
-# timer
-Workout timer
