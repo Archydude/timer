@@ -88,7 +88,7 @@
         function nextPhase() {
             if (phase === 'red') {
                 phase = 'green';
-                runTimer('green', 60, nextPhase);
+                runTimer('green', 120, nextPhase);
             } else {
                 phase = 'red';
                 runTimer('red', 30, nextPhase);
@@ -97,7 +97,7 @@
 
         function startForced(newPhase) {
             phase = newPhase;
-            let dur = newPhase === 'red' ? 30 : 60;
+            let dur = newPhase === 'red' ? 30 : 120;
             runTimer(newPhase, dur, nextPhase);
         }
 
